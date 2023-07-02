@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     if (!userId) return new NextResponse("Unauthorized", { status: 403 });
 
-    if (!name) return new NextResponse("name is required", { status: 403 });
+    if (!name) return new NextResponse("name is required", { status: 400 });
 
     const store = await prismaDb.store.create({
       data: {
