@@ -1,6 +1,5 @@
 "use client";
 import React, { FC, useState } from "react";
-import { BillboardColumn } from "./columns";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +13,10 @@ import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import AlertModal from "@/components/modals/alert-modal";
+import { CategoryColumn } from "./columns";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: CategoryColumn;
 }
 
 const CellAction: FC<CellActionProps> = ({ data }) => {
@@ -27,22 +27,20 @@ const CellAction: FC<CellActionProps> = ({ data }) => {
 
   const onCopy = () => {
     navigator.clipboard.writeText(data.id);
-    toast.success("Billboard ID copied!");
+    toast.success("Category ID copied!");
   };
   const onUpdate = () => {
-    router.push(`/${params.storeId}/billboards/${data.id}`);
+    router.push(`/${params.storeId}/categories/${data.id}`);
   };
   const onDelete = async () => {
     setDeleting(true);
     try {
-      await axios.delete(
-        `/api/${params.storeId}/billboards/${data.id}`
-      );
+      await axios.delete(`/api/${params.storeId}/categories/${data.id}`);
       router.refresh();
-      toast.success("Billboard Deleted");
+      toast.success("Category Deleted");
     } catch (error) {
       toast.error(
-        "Make sure you have removed all categories using this billboard first."
+        "Make sure you have removed all products using this category first."
       );
     } finally {
       setOpen(false);
