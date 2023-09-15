@@ -1,4 +1,5 @@
 import { prismaDb } from "@/lib/prismaDb";
+import { slugify } from "@/lib/utils";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
@@ -24,7 +25,7 @@ export async function POST(
     if (!userId) return new NextResponse("Unauthenticated", { status: 403 });
 
     if (!name) return new NextResponse("name is required", { status: 400 });
-
+    
     if (!images || !images.length) {
       return new NextResponse("Images are requred", { status: 400 });
     }
@@ -52,7 +53,7 @@ export async function POST(
 
     if (!storeByUserId)
       return new NextResponse("Action not allowed", { status: 403 });
-    const billboard = await prismaDb.product.create({
+    const product = await prismaDb.product.create({
       data: {
         name,
         price,
@@ -60,6 +61,7 @@ export async function POST(
         sizeId,
         colorId,
         isFeatured,
+        slug: slugify(name),
         isArchived,
         storeId: params.storeId,
         images: {
@@ -70,7 +72,7 @@ export async function POST(
       },
     });
 
-    return NextResponse.json(billboard);
+    return NextResponse.json(product);
   } catch (error) {
     console.log("🚀 ~ file: route.ts:24 ~ POST ~ error:", error);
     return new NextResponse("Internal error occured", { status: 500 });
@@ -82,6 +84,7 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   const { searchParams } = new URL(req.url);
+  const slug = searchParams.get("slug") || undefined;
   const categoryId = searchParams.get("categoryId") || undefined;
   const colorId = searchParams.get("colorId") || undefined;
   const sizeId = searchParams.get("sizeId") || undefined;
@@ -97,6 +100,7 @@ export async function GET(
         storeId: params.storeId,
         categoryId,
         colorId,
+        slug,
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
@@ -110,6 +114,7 @@ export async function GET(
         createdAt: "desc",
       },
     });
+
 
     return NextResponse.json(products);
   } catch (error) {

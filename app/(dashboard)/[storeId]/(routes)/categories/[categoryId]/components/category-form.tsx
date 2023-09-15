@@ -75,8 +75,17 @@ const CategoryForm: FC<CategoryFormProps> = ({ initialData, billboards }) => {
       router.refresh();
       router.push(`/${params.storeId}/categories`);
       toast.success(toastMessage);
-    } catch (error) {
-      toast.error("Something went wrong.");
+    } catch (error: any) {
+      if (error.response) {
+        // If the error has a response, it means it's an HTTP error from the API
+        const errorMessage = error.response.data.message;
+        console.log(errorMessage);
+        toast.error(errorMessage || "Something went wrong.");
+      } else {
+        // Handle non-HTTP errors (e.g., network issues)
+        console.error(error.message);
+        toast.error("Something went wrong.");
+      }
     }
   };
 

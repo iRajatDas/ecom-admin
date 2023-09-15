@@ -1,4 +1,5 @@
 import { prismaDb } from "@/lib/prismaDb";
+import { slugify } from "@/lib/utils";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
@@ -58,6 +59,7 @@ export async function PATCH(
       },
       data: {
         name,
+        slug: slugify(name),
         billboardId,
         storeId: params.storeId,
       },

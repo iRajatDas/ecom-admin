@@ -1,18 +1,20 @@
 import { prismaDb } from "@/lib/prismaDb";
+import { slugify } from "@/lib/utils";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  { params }: { params: { storeId: string; slug: string } }
 ) {
+  console.log(params.slug)
   try {
-    if (!params.productId)
+    if (!params.slug)
       return new NextResponse("Product id is required", { status: 400 });
 
     const product = await prismaDb.product.findUnique({
       where: {
-        id: params.productId,
+        slug: params.slug,
       },
     });
 
@@ -25,7 +27,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  { params }: { params: { storeId: string; slug: string } }
 ) {
   try {
     console.log(params);
@@ -61,8 +63,8 @@ export async function PATCH(
     // if (!isArchived)
     //   return new NextResponse("isArchived is required", { status: 400 });
 
-    if (!params.productId)
-      return new NextResponse("product id is required", { status: 400 });
+    if (!params.slug)
+      return new NextResponse("slug is required", { status: 400 });
 
     const storeByUserId = await prismaDb.store.findFirst({
       where: {
@@ -75,7 +77,7 @@ export async function PATCH(
       return new NextResponse("Action not allowed", { status: 403 });
     await prismaDb.product.update({
       where: {
-        id: params.productId,
+        slug: params.slug,
       },
       data: {
         name,
@@ -85,6 +87,7 @@ export async function PATCH(
         sizeId,
         isFeatured,
         isArchived,
+        slug: slugify(name),
         storeId: params.storeId,
         images: {
           deleteMany: {},
@@ -94,7 +97,7 @@ export async function PATCH(
 
     const product = await prismaDb.product.update({
       where: {
-        id: params.productId,
+        slug: params.slug,
       },
       data: {
         images: {
@@ -114,13 +117,13 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  { params }: { params: { storeId: string; slug: string } }
 ) {
   try {
     const { userId } = auth();
 
     if (!userId) return new NextResponse("Unauthorized", { status: 403 });
-    if (!params.productId)
+    if (!params.slug)
       return new NextResponse("product id is required", { status: 400 });
 
     const storeByUserId = await prismaDb.store.findFirst({
@@ -135,7 +138,7 @@ export async function DELETE(
 
     const product = await prismaDb.product.deleteMany({
       where: {
-        id: params.productId,
+        slug: params.slug,
       },
     });
 
