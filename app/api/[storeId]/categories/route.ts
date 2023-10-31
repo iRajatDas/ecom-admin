@@ -1,5 +1,5 @@
 import { prismaDb } from "@/lib/prismaDb";
-import { slugify } from "@/lib/utils";
+// import { slugify } from "@/lib/utils";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
@@ -33,25 +33,9 @@ export async function POST(
     if (!storeByUserId)
       return new NextResponse("Action not allowed", { status: 403 });
 
-    const slug = slugify(name);
-
-    const existingCategory = await prismaDb.category.findFirst({
-      where: { slug: slug },
-    });
-
-    if (existingCategory)
-      return NextResponse.json(
-        {
-          error: `Category with slug: '${slug}' already exists`,
-          message: "Category already exists",
-        },
-        { status: 403 }
-      );
-
     const category = await prismaDb.category.create({
       data: {
         name,
-        slug,
         billboardId,
         storeId: params.storeId,
       },

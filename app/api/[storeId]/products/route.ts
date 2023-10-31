@@ -1,5 +1,5 @@
 import { prismaDb } from "@/lib/prismaDb";
-import { slugify } from "@/lib/utils";
+// import { slugify } from "@/lib/utils";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
@@ -61,7 +61,7 @@ export async function POST(
         sizeId,
         colorId,
         isFeatured,
-        slug: slugify(name),
+        // slug: slugify(name),
         isArchived,
         storeId: params.storeId,
         images: {
@@ -84,7 +84,7 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug") || undefined;
+  // const slug = searchParams.get("slug") || undefined;
   const categoryId = searchParams.get("categoryId") || undefined;
   const colorId = searchParams.get("colorId") || undefined;
   const sizeId = searchParams.get("sizeId") || undefined;
@@ -100,7 +100,7 @@ export async function GET(
         storeId: params.storeId,
         categoryId,
         colorId,
-        slug,
+        // slug,
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
@@ -109,6 +109,7 @@ export async function GET(
         images: true,
         color: true,
         size: true,
+        category: true,
       },
       orderBy: {
         createdAt: "desc",
